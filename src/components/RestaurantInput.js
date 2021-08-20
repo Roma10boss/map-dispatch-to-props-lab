@@ -1,29 +1,51 @@
-import React, { Component } from 'react';
+mport React, { Component } from 'react';
 import { addRestaurant } from '../actions/restaurants';
 import { connect } from 'react-redux';
 
+// This is an example of how to map state to props and
+// map dispatch to props. This component has local state
+// that holds form state, but upon form submission, calls
+// a locally defined method (addRestaurnt2) that has been
+// mapped in mapDispatchToProps to an imported method
+// called addRestaurant. The imported method is an action
+// creator that takes a restaurant object as an argument and
+// returns a new action object containing that restaurant
+// object. The mapping is actually to a call to dispatch(
+// addRestaurant(restaurant)). This way, we can abstract
+// out any mention of dispatch in our handleOnSubmit 
+// handler. If we weren't using this mapping, we'd need 
+// to include this.props.dispatch(...) in the handler.
+
 export class RestaurantInput extends Component {
 
+  // Local state
   state = {
     name: '',
     location: ''
   }
 
+  // Set local state upon name change event
   handleOnNameChange = event => {
     this.setState({
       name: event.target.value
     });
   }
 
+  // Set local state upon location change event
   handleOnLocationChange = event => {
     this.setState({
       location: event.target.value
     });
   }
 
+  // Set state in store upon submit by calling addRestaurant,
+  // a function that we defined locally and mapped in 
+  // mapDispatchToProps to the addRestaurant action creator.
   handleOnSubmit = event => {
     event.preventDefault();
-    // add missing code
+    // Use the addRestaurant2 method we mapped to props below
+    this.props.addRestaurant2({name: this.state.name, location: this.state.location});
+    
   }
 
   render() {
@@ -50,5 +72,18 @@ export class RestaurantInput extends Component {
 };
 
 
+const mapStateToProps = (state) => {
+  return {
+    restaurants: state.restaurants
+  }
+}
+
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addRestaurant2: (restaurant) => dispatch(addRestaurant(restaurant)),
+  }
+}
+
 //connect this component by wrapping RestaurantInput below
-export default RestaurantInput
+export default connect(mapStateToProps, mapDispatchToProps)(RestaurantInput);
